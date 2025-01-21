@@ -58,7 +58,11 @@ class FornecedorController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $fornecedor = $this->model->find($id);
+        if($fornecedor !== null){
+            return response()->json($fornecedor, 200);
+        }
+        return response()->json(["Erro" => "Recurso não encontrado!"], 404);
     }
 
     /**
