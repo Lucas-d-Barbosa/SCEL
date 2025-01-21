@@ -69,11 +69,19 @@ class FornecedorController extends Controller
      */
     public function show(string $id)
     {
-        $fornecedor = $this->model->find($id);
-        if($fornecedor !== null){
-            return response()->json($fornecedor, 200);
+        try{
+            $fornecedor = $this->model->find($id);
+            if($fornecedor !== null){
+                return response()->json($fornecedor, 200);
+            }
+            return response()->json(["Erro" => "Recurso não encontrado!"], 404);
+        } catch(Exception $e){
+            return response()->json(
+                [
+                "Erro" => "Erro ao acessar o recurso", 
+                "mensagem" => $e->getMessage()
+            ], 505);
         }
-        return response()->json(["Erro" => "Recurso não encontrado!"], 404);
     }
 
     /**
@@ -89,7 +97,34 @@ class FornecedorController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        try
+        {
+            $fornecedor = $this->model->find($id);
+
+            if($request->method() === "PATCH")
+            {
+                return response()->json(["msg" => "Método PUT"], 201);
+            }
+            $request->validate($this->model->rules($id));
+            $fornecedor->update($request->all());
+        }
+        catch(\Illuminate\Validation\ValidationException $e)
+        {
+            return response()->json([
+                'error' => 'Erro de validação',
+                'messages' => $e->errors()
+            ], 422);
+
+        }
+        catch(Exception $e)
+        {
+            return response()->json(
+                [
+                "Erro" => "Erro ao atualizar o recurso", 
+                "mensagem" => $e->getMessage()
+            ], 505);
+
+        }
     }
 
     /**
