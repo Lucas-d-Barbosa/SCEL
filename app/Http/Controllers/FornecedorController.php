@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Fornecedor;
+use Exception;
 use Illuminate\Http\Request;
 
 class FornecedorController extends Controller
@@ -42,7 +43,14 @@ class FornecedorController extends Controller
      */
     public function store(Request $request)
     {
-        //
+
+        $request->validate($this->model->rules());
+        try{
+            $request->validate($this->model->rules());
+        }catch(Exception $e){
+            return response()->json(["Error: " => "Passe todos os atributos necessários!"], 400);
+        }
+        $this->model->create($request->all());
     }
 
     /**
