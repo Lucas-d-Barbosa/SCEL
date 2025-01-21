@@ -43,14 +43,25 @@ class FornecedorController extends Controller
      */
     public function store(Request $request)
     {
-
-        $request->validate($this->model->rules());
-        try{
+        try
+        {
             $request->validate($this->model->rules());
-        }catch(Exception $e){
-            return response()->json(["Error: " => "Passe todos os atributos necessários!"], 400);
+            $fornecedor = $this->model->create($request->all());
+            return response()->json($fornecedor, 201);
         }
-        $this->model->create($request->all());
+        catch(\Illuminate\Validation\ValidationException $e)
+        {
+            return response()->json([
+                'error' => 'Erro de validação',
+                'messages' => $e->errors()
+            ], 422);
+        }
+        catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Erro ao criar o recurso',
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
